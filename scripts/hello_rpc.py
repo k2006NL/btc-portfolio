@@ -19,7 +19,7 @@ import requests
 from dotenv import load_dotenv
 
 load_dotenv()
-
+random.seed(216)
 RPC_URL = os.environ["BTC_RPC_URL"]
 AUTH = (os.environ["BTC_RPC_USER"], os.environ["BTC_RPC_PASSWORD"])
 WALLET = "kei"
@@ -72,15 +72,30 @@ def main():
     print(json.dumps(block["tx"][1], indent=2)[:1500])
     rows = []
     for tx in block['tx']:
-        vals = [out["values"] for out in tx["vout"]]
-        rows.append({"txid"      : tx["txid"][:12],
-                     "vin"       : len(tx["vin"]),
-                     "vout"      : len(tx["vout"]),
-                     "val"       : vals,
-                     "val_amount": sum(val)
-                     })
+        if "coinbase" in tx["vin"][0]:
+            continue
+        vals = [out["value"] for out in tx["vout"]]
+        bf_deal_out=0
+        for tx_in in tx["vin"]:
+        
+            bf_deal = rpc("getrawtransaction", tx_in["txid"], True)
+            bf_deal_out += round(bf_deal["vout"][tx_in["vout"]]["value"] * 1e8)
+        out_sat = sum(round(v * 1e8) for v in vals)
+        rows.append({
+            "txid"      : tx["txid"][:12],
+            "vin"       : len(tx["vin"]),
+            "vout"      : len(tx["vout"]),
+            "val"       : vals,
+            "val_amount": out_sat / 1e8,
+            "fee"       : bf_deal_out - out_sat,
+            "sat_per_vB": (bf_deal_out - out_sat) / tx["vsize"]
+        })
+        
+        
+        
     tr_df = pd.DataFrame(rows)
     print(tr_df.to_string(index=False))
+
 
 
 if __name__ == "__main__":
