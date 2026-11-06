@@ -1,0 +1,9 @@
+requests
+python-dotenv
+# Step 2以降で追加していく
+# psycopg[binary]
+# fastapi
+# uvicorn
+pandas
+# networkx
+# torch / torch_geometric
