@@ -1,7 +1,10 @@
 # btc-portfolio
 
 Bitcoinのregtestノードから取引データを取り込み、DBに入れてAPIで提供し、不正検知までやるポートフォリオ。
-**バックエンド × データエンジニアリング × データサイエンス** を1本で通す。
+**バックエンド × データエンジニアリング × データサイエンス** を1本で。
+
+ロードマップ建てと、わからないところの質問対応、Step 0 のベーシックなコードは`Claude Opus 5.5`
+参考図書は『マスタリング・ビットコイン（第三版）』 
 
 ```
 bitcoind (regtest) ──RPC──▶ ingest (Python) ──▶ PostgreSQL ──▶ FastAPI
@@ -9,11 +12,23 @@ bitcoind (regtest) ──RPC──▶ ingest (Python) ──▶ PostgreSQL ─�
                                                      └──▶ 分析 / GNN不正検知 (Elliptic)
 ```
 
+## 構成
+```
+btc-portfolio
+├── README.md
+├── docker-compose.yml
+├── docs
+│   └── step0.md
+├── requirements.txt
+└── scripts
+    └── hello_rpc.py
+```
 ## セットアップ
 
 ```bash
+cp .env.example .env
 docker compose up -d
-python -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 python scripts/hello_rpc.py   # Step 0
 ```
@@ -31,7 +46,7 @@ python scripts/hello_rpc.py   # Step 0
 - `hello_rpc.py` を動かして、ブロックと取引のJSONを眺める
 - `vin` / `vout` / `scriptPubKey` / `value` が何を意味するか説明できるようにする
 - 📖 MB: 鍵とアドレス、トランザクションの章
-- ✅ 完成条件: 「UTXOとは何か」「coinbase取引はなぜ100ブロック使えないか」を自分の言葉でREADMEに書ける
+- ✅ 完成条件: 「UTXOとは何か」「coinbase取引はなぜ100ブロック使えないか」を自分の言葉でdocs/step0.mdに書ける
 
 ### Step 1: 取引を自分で作る(1日)
 - 送金パターンを作るスクリプト `scripts/simulate.py` を書く
@@ -81,7 +96,7 @@ python scripts/hello_rpc.py   # Step 0
 
 ## 進捗ログ
 
-- [ ] Step 0
+- [x] Step 0 - [学習メモ](docs/step0.md)
 - [ ] Step 1
 - [ ] Step 2
 - [ ] Step 3
